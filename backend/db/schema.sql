@@ -67,3 +67,45 @@ VALUES
 (4, 100, 0),
 (5, 80, 0),
 (6, 250, 0);
+
+CREATE TABLE enquiries (
+    id SERIAL PRIMARY KEY,
+    enquiry_number VARCHAR(50) UNIQUE NOT NULL,
+    customer_id INTEGER NOT NULL,
+    enquiry_date DATE NOT NULL DEFAULT CURRENT_DATE,
+    required_date DATE NOT NULL,
+    notes TEXT,
+    status VARCHAR(20) NOT NULL DEFAULT 'NEW',
+
+    CONSTRAINT fk_enquiry_customer
+        FOREIGN KEY (customer_id)
+        REFERENCES customers(id),
+
+    CONSTRAINT check_enquiry_status
+        CHECK (status IN ('NEW', 'QUOTED', 'WON', 'LOST')),
+
+    CONSTRAINT check_required_date
+        CHECK (required_date >= enquiry_date)
+);
+
+CREATE TABLE enquiry_items (
+    id SERIAL PRIMARY KEY,
+    enquiry_id INTEGER NOT NULL,
+    product_id INTEGER NOT NULL,
+    quantity INTEGER NOT NULL,
+
+    CONSTRAINT fk_enquiry_item_enquiry
+        FOREIGN KEY (enquiry_id)
+        REFERENCES enquiries(id)
+        ON DELETE CASCADE,
+
+    CONSTRAINT fk_enquiry_item_product
+        FOREIGN KEY (product_id)
+        REFERENCES products(id),
+
+    CONSTRAINT check_enquiry_item_quantity
+        CHECK (quantity > 0),
+
+    CONSTRAINT unique_enquiry_product
+        UNIQUE (enquiry_id, product_id)
+);

@@ -1,0 +1,69 @@
+CREATE TABLE users (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(100) NOT NULL,
+    email VARCHAR(150) UNIQUE NOT NULL,
+    password VARCHAR(255) NOT NULL,
+    role VARCHAR(20) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE customers (
+    id SERIAL PRIMARY KEY,
+    company_name VARCHAR(150) NOT NULL,
+    contact_person VARCHAR(100) NOT NULL,
+    mobile VARCHAR(20) NOT NULL,
+    email VARCHAR(150),
+    city VARCHAR(100) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE products (
+    id SERIAL PRIMARY KEY,
+    product_code VARCHAR(50) UNIQUE NOT NULL,
+    product_name VARCHAR(150) NOT NULL,
+    category VARCHAR(100) NOT NULL,
+    unit VARCHAR(30) NOT NULL,
+    base_price NUMERIC(12, 2) NOT NULL CHECK (base_price >= 0),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+INSERT INTO products
+(product_code, product_name, category, unit, base_price)
+VALUES
+('IP-001', 'Industrial Product A', 'Mechanical', 'Piece', 1500.00),
+('IP-002', 'Industrial Product B', 'Mechanical', 'Piece', 2200.00),
+('IP-003', 'Industrial Product C', 'Electrical', 'Piece', 1800.00),
+('IP-004', 'Industrial Product D', 'Electrical', 'Piece', 3200.00),
+('IP-005', 'Industrial Product E', 'Hydraulic', 'Piece', 4500.00),
+('IP-006', 'Industrial Product F', 'Safety', 'Piece', 850.00);
+
+
+CREATE TABLE inventory (
+    id SERIAL PRIMARY KEY,
+    product_id INTEGER UNIQUE NOT NULL,
+    physical_quantity INTEGER NOT NULL DEFAULT 0,
+    reserved_quantity INTEGER NOT NULL DEFAULT 0,
+
+    CONSTRAINT fk_inventory_product
+        FOREIGN KEY (product_id)
+        REFERENCES products(id),
+
+    CONSTRAINT check_physical_quantity
+        CHECK (physical_quantity >= 0),
+
+    CONSTRAINT check_reserved_quantity
+        CHECK (reserved_quantity >= 0),
+
+    CONSTRAINT check_reserved_not_more_than_physical
+        CHECK (reserved_quantity <= physical_quantity)
+);
+
+INSERT INTO inventory
+(product_id, physical_quantity, reserved_quantity)
+VALUES
+(1, 200, 0),
+(2, 150, 0),
+(3, 300, 0),
+(4, 100, 0),
+(5, 80, 0),
+(6, 250, 0);

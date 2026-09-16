@@ -162,3 +162,73 @@ CREATE TABLE quotation_items (
     CONSTRAINT unique_quotation_product
         UNIQUE (quotation_id, product_id)
 );
+
+CREATE TABLE sales_orders (
+    id SERIAL PRIMARY KEY,
+    order_number VARCHAR(50) UNIQUE NOT NULL,
+    quotation_id INTEGER UNIQUE NOT NULL,
+    customer_id INTEGER NOT NULL,
+    order_date DATE NOT NULL DEFAULT CURRENT_DATE,
+    total_amount NUMERIC(12, 2) NOT NULL,
+    status VARCHAR(20) NOT NULL DEFAULT 'PENDING',
+
+    CONSTRAINT fk_sales_order_quotation
+        FOREIGN KEY (quotation_id)
+        REFERENCES quotations(id),
+
+    CONSTRAINT fk_sales_order_customer
+        FOREIGN KEY (customer_id)
+        REFERENCES customers(id),
+
+    CONSTRAINT check_sales_order_total
+        CHECK (total_amount >= 0),
+
+    CONSTRAINT check_sales_order_status
+        CHECK (
+            status IN (
+                'PENDING',
+                'CONFIRMED',
+                'DISPATCHED',
+                'CANCELLED'
+            )
+        )
+);
+
+CREATE TABLE sales_order_items (
+    id SERIAL PRIMARY KEY,
+    sales_order_id INTEGER NOT NULL,
+    product_id INTEGER NOT NULL,
+    quantity INTEGER NOT NULL,
+    unit_price NUMERIC(12, 2) NOT NULL,
+
+    CONSTRAINT fk_sales_order_item_order
+        FOREIGN KEY (sales_order_id)
+        REFERENCES sales_orders(id)
+        ON DELETE CASCADE,
+
+    CONSTRAINT fk_sales_order_item_product
+        FOREIGN KEY (product_id)
+        REFERENCES products(id),
+
+    CONSTRAINT check_sales_order_item_quantity
+        CHECK (quantity > 0),
+
+    CONSTRAINT check_sales_order_item_price
+        CHECK (unit_price >= 0),
+
+    CONSTRAINT unique_sales_order_product
+        UNIQUE (sales_order_id, product_id)
+);
+
+CREATE TABLE dispatches (
+    id SERIAL PRIMARY KEY,
+    dispatch_number VARCHAR(50) UNIQUE NOT NULL,
+    sales_order_id INTEGER UNIQUE NOT NULL,
+    dispatch_date DATE NOT NULL DEFAULT CURRENT_DATE,
+    vehicle_number VARCHAR(50) NOT NULL,
+    driver_name VARCHAR(100) NOT NULL,
+
+    CONSTRAINT fk_dispatch_sales_order
+        FOREIGN KEY (sales_order_id)
+        REFERENCES sales_orders(id)
+);

@@ -109,3 +109,56 @@ CREATE TABLE enquiry_items (
     CONSTRAINT unique_enquiry_product
         UNIQUE (enquiry_id, product_id)
 );
+
+CREATE TABLE quotations (
+    id SERIAL PRIMARY KEY,
+    quotation_number VARCHAR(50) UNIQUE NOT NULL,
+    enquiry_id INTEGER UNIQUE NOT NULL,
+    quotation_date DATE NOT NULL DEFAULT CURRENT_DATE,
+    valid_until DATE NOT NULL,
+    status VARCHAR(20) NOT NULL DEFAULT 'DRAFT',
+
+    CONSTRAINT fk_quotation_enquiry
+        FOREIGN KEY (enquiry_id)
+        REFERENCES enquiries(id),
+
+    CONSTRAINT check_quotation_status
+        CHECK (status IN ('DRAFT', 'SENT', 'ACCEPTED', 'REJECTED')),
+
+    CONSTRAINT check_quotation_validity
+        CHECK (valid_until >= quotation_date)
+);
+
+CREATE TABLE quotation_items (
+    id SERIAL PRIMARY KEY,
+    quotation_id INTEGER NOT NULL,
+    product_id INTEGER NOT NULL,
+    quantity INTEGER NOT NULL,
+    unit_price NUMERIC(12, 2) NOT NULL,
+    discount_percent NUMERIC(5, 2) NOT NULL DEFAULT 0,
+    gst_percent NUMERIC(5, 2) NOT NULL DEFAULT 0,
+
+    CONSTRAINT fk_quotation_item_quotation
+        FOREIGN KEY (quotation_id)
+        REFERENCES quotations(id)
+        ON DELETE CASCADE,
+
+    CONSTRAINT fk_quotation_item_product
+        FOREIGN KEY (product_id)
+        REFERENCES products(id),
+
+    CONSTRAINT check_quotation_item_quantity
+        CHECK (quantity > 0),
+
+    CONSTRAINT check_unit_price
+        CHECK (unit_price >= 0),
+
+    CONSTRAINT check_discount
+        CHECK (discount_percent >= 0 AND discount_percent <= 100),
+
+    CONSTRAINT check_gst
+        CHECK (gst_percent >= 0),
+
+    CONSTRAINT unique_quotation_product
+        UNIQUE (quotation_id, product_id)
+);

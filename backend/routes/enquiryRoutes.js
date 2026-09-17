@@ -14,21 +14,21 @@ const router = express.Router();
 router.post(
   "/",
   authenticateToken,
-  authorizeRoles("ADMIN", "SALES_USER"),
+  authorizeRoles("ADMIN", "USER"),
   createEnquiry
 );
 
 router.get(
   "/",
   authenticateToken,
-  authorizeRoles("ADMIN", "SALES_USER"),
+  authorizeRoles("ADMIN", "USER"),
   getEnquiries
 );
 
 router.get(
   "/:id",
   authenticateToken,
-  authorizeRoles("ADMIN", "SALES_USER"),
+  authorizeRoles("ADMIN", "USER"),
   getEnquiryById
 );
 

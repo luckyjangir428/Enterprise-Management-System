@@ -13,14 +13,14 @@ const router = express.Router();
 router.get(
   "/",
   authenticateToken,
-  authorizeRoles("ADMIN", "SALES_USER"),
+  authorizeRoles("ADMIN", "USER"),
   getInventory
 );
 
 router.get(
   "/product/:productId",
   authenticateToken,
-  authorizeRoles("ADMIN", "SALES_USER"),
+  authorizeRoles("ADMIN", "USER"),
   getInventoryByProduct
 );
 module.exports = router;

@@ -15,28 +15,28 @@ const router = express.Router();
 router.post(
   "/",
   authenticateToken,
-  authorizeRoles("ADMIN", "SALES_USER"),
+  authorizeRoles("ADMIN", "USER"),
   createQuotation
 );
 
 router.patch(
   "/:id/status",
   authenticateToken,
-  authorizeRoles("ADMIN", "SALES_USER"),
+  authorizeRoles("ADMIN", "USER"),
   updateQuotationStatus
 );
 
 router.post(
   "/:id/convert",
   authenticateToken,
-  authorizeRoles("ADMIN", "SALES_USER"),
+  authorizeRoles("ADMIN", "USER"),
   convertQuotationToSalesOrder
 );
 
 router.get(
   "/",
   authenticateToken,
-  authorizeRoles("ADMIN", "SALES_USER"),
+  authorizeRoles("ADMIN", "USER"),
   getQuotations
 );
 module.exports = router;

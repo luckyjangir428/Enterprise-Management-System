@@ -12,7 +12,7 @@ const router = express.Router();
 router.get(
   "/",
   authenticateToken,
-  authorizeRoles("ADMIN", "SALES_USER"),
+  authorizeRoles("ADMIN", "USER"),
   getProducts
 );
 

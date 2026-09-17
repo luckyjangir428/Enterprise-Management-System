@@ -20,7 +20,7 @@ describe("RBAC API", () => {
     await db.end();
   });
 
-  test("should not allow SALES_USER to confirm a Sales Order", async () => {
+  test("should not allow USER to confirm a Sales Order", async () => {
     const response = await request(app)
       .post("/api/sales-orders/2/confirm")
       .set("Authorization", `Bearer ${salesToken}`);

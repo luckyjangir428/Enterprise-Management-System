@@ -12,14 +12,14 @@ const router = express.Router();
 router.post(
   "/",
   authenticateToken,
-  authorizeRoles("ADMIN", "SALES_USER"),
+  authorizeRoles("ADMIN", "USER"),
   createCustomer
 );
 
 router.get(
   "/",
   authenticateToken,
-  authorizeRoles("ADMIN", "SALES_USER"),
+  authorizeRoles("ADMIN", "USER"),
   getCustomers
 );
 

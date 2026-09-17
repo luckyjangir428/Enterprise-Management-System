@@ -87,6 +87,7 @@ const handleSubmit = async (event) => {
       body: JSON.stringify({
         enquiryNumber: `ENQ-${Date.now()}`,
         customerId: Number(customerId),
+        enquiryDate,
         requiredDate,
         products: items.map((item) => ({
           productId: Number(item.product_id),
@@ -119,8 +120,6 @@ const handleSubmit = async (event) => {
     setSubmitting(false);
   }
 };
-
-
 
   return (
     <div className="min-h-screen bg-gray-100">

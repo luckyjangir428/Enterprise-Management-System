@@ -19,7 +19,7 @@ The system manages the complete business workflow:
 * Two user roles:
 
   * `ADMIN`
-  * `SALES_USER`
+  * `USER`
 
 ### Customer & Enquiry Management
 
@@ -285,7 +285,7 @@ Role: ADMIN
 ```text
 Email: sales@example.com
 Password: Sales@123
-Role: SALES_USER
+Role: USER
 ```
 
 These are demonstration credentials for the seeded development database.
@@ -382,7 +382,7 @@ Inventory Reservation
 
 ## Role Permissions
 
-| Operation                | ADMIN | SALES_USER |
+| Operation                | ADMIN | USER |
 | ------------------------ | ----: | ---------: |
 | View enquiries           |     ✓ |          ✓ |
 | Create enquiries         |     ✓ |          ✓ |

@@ -16,7 +16,7 @@ const router = express.Router();
 router.get(
   "/",
   authenticateToken,
-  authorizeRoles("ADMIN", "SALES_USER"),
+  authorizeRoles("ADMIN", "USER"),
   getSalesOrders
 
 );
@@ -24,7 +24,7 @@ router.get(
 router.get(
   "/:id",
   authenticateToken,
-  authorizeRoles("ADMIN", "SALES_USER"),
+  authorizeRoles("ADMIN", "USER"),
   getSalesOrderById
 );
 

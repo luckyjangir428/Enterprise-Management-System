@@ -7,6 +7,7 @@ const createEnquiry = async (req, res) => {
     const {
       enquiryNumber,
       customerId,
+      enquiryDate,
       requiredDate,
       products,
       notes,
@@ -15,13 +16,14 @@ const createEnquiry = async (req, res) => {
     if (
       !enquiryNumber ||
       !customerId ||
+      !enquiryDate ||
       !requiredDate ||
       !products ||
       products.length === 0
     ) {
       return res.status(400).json({
         message:
-          "Enquiry number, customer, required date and products are required",
+          "Enquiry number, customer, enquiry date, required date and products are required",
       });
     }
 
@@ -42,12 +44,13 @@ const createEnquiry = async (req, res) => {
 
     const enquiryResult = await client.query(
       `INSERT INTO enquiries
-       (enquiry_number, customer_id, required_date, notes)
-       VALUES ($1, $2, $3, $4)
+       (enquiry_number, customer_id, enquiry_date, required_date, notes)
+       VALUES ($1, $2, $3, $4, $5)
        RETURNING *`,
       [
         enquiryNumber,
         customerId,
+        enquiryDate,
         requiredDate,
         notes || null,
       ]
@@ -87,6 +90,7 @@ const createEnquiry = async (req, res) => {
   }
 };
 
+
 const getEnquiries = async (req, res) => {
   try {
     const result = await pool.query(`
@@ -117,6 +121,7 @@ const getEnquiries = async (req, res) => {
     });
   }
 };
+
 
 const getEnquiryById = async (req, res) => {
   try {
@@ -182,8 +187,9 @@ const getEnquiryById = async (req, res) => {
   }
 };
 
+
 module.exports = {
   createEnquiry,
   getEnquiries,
-    getEnquiryById,
+  getEnquiryById,
 };

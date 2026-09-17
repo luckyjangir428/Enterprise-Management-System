@@ -20,7 +20,7 @@ const seedUsers = async () => {
         "Sales User",
         "sales@example.com",
         salesPassword,
-        "SALES_USER",
+        "USER",
       ]
     );
 

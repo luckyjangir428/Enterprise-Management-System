@@ -1,15 +1,18 @@
 const express = require("express");
 const pool = require("./config/db");
+const healthRoutes = require("./routes/healthRoutes");
+const authRoutes = require("./routes/authRoutes");
+const protectedRoutes = require("./routes/protectedRoutes");
 
 const app = express();
+app.use(express.json());
+
+
+app.use("/api/health", healthRoutes);
+app.use("/api/auth", authRoutes);
+app.use("/api/protected", protectedRoutes);
 
 const PORT = process.env.PORT || 5000;
-
-app.get("/", (req, res) => {
-  res.json({
-    message: "Backend is running",
-  });
-});
 
 app.get("/db-test", async (req, res) => {
   try {

@@ -341,8 +341,40 @@ const convertQuotationToSalesOrder = async (req, res) => {
   }
 };
 
+const getQuotations = async (req, res) => {
+  try {
+    const result = await pool.query(`
+      SELECT
+        q.id,
+        q.quotation_number,
+        q.quotation_date,
+        q.valid_until,
+        q.status,
+        e.enquiry_number,
+        c.company_name
+      FROM quotations q
+      JOIN enquiries e
+        ON q.enquiry_id = e.id
+      JOIN customers c
+        ON e.customer_id = c.id
+      ORDER BY q.id DESC
+    `);
+
+    res.json({
+      quotations: result.rows,
+    });
+  } catch (error) {
+    console.error(error);
+
+    res.status(500).json({
+      message: "Server error",
+    });
+  }
+};
+
 module.exports = {
   createQuotation,
     updateQuotationStatus,
     convertQuotationToSalesOrder,
+    getQuotations,
 };

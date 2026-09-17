@@ -1,35 +1,19 @@
 const express = require("express");
 
 const {
-  createEnquiry,
-  getEnquiries,
-  getEnquiryById
-} = require("../controllers/enquiryController");
+  getProducts,
+} = require("../controllers/productController");
 
 const authenticateToken = require("../middleware/authMiddleware");
 const authorizeRoles = require("../middleware/roleMiddleware");
 
 const router = express.Router();
 
-router.post(
-  "/",
-  authenticateToken,
-  authorizeRoles("ADMIN", "SALES_USER"),
-  createEnquiry
-);
-
 router.get(
   "/",
   authenticateToken,
   authorizeRoles("ADMIN", "SALES_USER"),
-  getEnquiries
-);
-
-router.get(
-  "/:id",
-  authenticateToken,
-  authorizeRoles("ADMIN", "SALES_USER"),
-  getEnquiryById
+  getProducts
 );
 
 module.exports = router;

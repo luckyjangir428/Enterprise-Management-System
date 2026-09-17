@@ -44,6 +44,34 @@ const createCustomer = async (req, res) => {
   }
 };
 
+const getCustomers = async (req, res) => {
+  try {
+    const result = await pool.query(`
+      SELECT
+        id,
+        company_name,
+        contact_person,
+        mobile,
+        email,
+        city,
+        created_at
+      FROM customers
+      ORDER BY id DESC
+    `);
+
+    res.json({
+      customers: result.rows,
+    });
+  } catch (error) {
+    console.error(error);
+
+    res.status(500).json({
+      message: "Server error",
+    });
+  }
+};
+
 module.exports = {
   createCustomer,
+    getCustomers,
 };

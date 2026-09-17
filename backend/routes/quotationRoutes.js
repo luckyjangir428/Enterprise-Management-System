@@ -3,7 +3,8 @@ const express = require("express");
 const {
   createQuotation,
     updateQuotationStatus,
-    convertQuotationToSalesOrder
+    convertQuotationToSalesOrder,
+    getQuotations,
 } = require("../controllers/quotationController");
 
 const authenticateToken = require("../middleware/authMiddleware");
@@ -30,5 +31,12 @@ router.post(
   authenticateToken,
   authorizeRoles("ADMIN", "SALES_USER"),
   convertQuotationToSalesOrder
+);
+
+router.get(
+  "/",
+  authenticateToken,
+  authorizeRoles("ADMIN", "SALES_USER"),
+  getQuotations
 );
 module.exports = router;

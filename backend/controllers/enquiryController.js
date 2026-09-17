@@ -118,7 +118,72 @@ const getEnquiries = async (req, res) => {
   }
 };
 
+const getEnquiryById = async (req, res) => {
+  try {
+    const enquiryId = req.params.id;
+
+    const enquiryResult = await pool.query(
+      `
+      SELECT
+        e.id,
+        e.enquiry_number,
+        e.enquiry_date,
+        e.required_date,
+        e.notes,
+        e.status,
+        c.id AS customer_id,
+        c.company_name,
+        c.contact_person,
+        c.mobile,
+        c.email,
+        c.city
+      FROM enquiries e
+      JOIN customers c
+        ON e.customer_id = c.id
+      WHERE e.id = $1
+      `,
+      [enquiryId]
+    );
+
+    if (enquiryResult.rows.length === 0) {
+      return res.status(404).json({
+        message: "Enquiry not found",
+      });
+    }
+
+    const itemsResult = await pool.query(
+      `
+      SELECT
+        ei.product_id,
+        p.product_code,
+        p.product_name,
+        p.category,
+        p.unit,
+        ei.quantity
+      FROM enquiry_items ei
+      JOIN products p
+        ON ei.product_id = p.id
+      WHERE ei.enquiry_id = $1
+      ORDER BY ei.id
+      `,
+      [enquiryId]
+    );
+
+    res.json({
+      enquiry: enquiryResult.rows[0],
+      products: itemsResult.rows,
+    });
+  } catch (error) {
+    console.error(error);
+
+    res.status(500).json({
+      message: "Server error",
+    });
+  }
+};
+
 module.exports = {
   createEnquiry,
   getEnquiries,
+    getEnquiryById,
 };

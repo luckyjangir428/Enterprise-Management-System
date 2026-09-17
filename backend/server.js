@@ -8,6 +8,7 @@ const enquiryRoutes = require("./routes/enquiryRoutes");
 const inventoryRoutes = require("./routes/inventoryRoutes");
 const quotationRoutes = require("./routes/quotationRoutes");
 const salesOrderRoutes = require("./routes/salesOrderRoutes");
+const productRoutes = require("./routes/productRoutes");
 
 const app = express();
 app.use(express.json());
@@ -20,6 +21,7 @@ app.use("/api/enquiries", enquiryRoutes);
 app.use("/api/inventory", inventoryRoutes);
 app.use("/api/quotations", quotationRoutes);
 app.use("/api/sales-orders", salesOrderRoutes);
+app.use("/api/products", productRoutes);
 
 const PORT = process.env.PORT || 5000;
 

@@ -4,6 +4,7 @@ const {
   getSalesOrders,
   confirmSalesOrder,
     dispatchSalesOrder,
+    getSalesOrderById
 } = require("../controllers/salesOrderController");
 
 const authenticateToken = require("../middleware/authMiddleware");
@@ -16,6 +17,13 @@ router.get(
   authenticateToken,
   authorizeRoles("ADMIN", "SALES_USER"),
   getSalesOrders
+);
+
+router.get(
+  "/:id",
+  authenticateToken,
+  authorizeRoles("ADMIN", "SALES_USER"),
+  getSalesOrderById
 );
 
 router.post(
@@ -31,5 +39,7 @@ router.post(
   authorizeRoles("ADMIN"),
   dispatchSalesOrder
 );
+
+
 
 module.exports = router;

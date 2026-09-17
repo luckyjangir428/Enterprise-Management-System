@@ -311,9 +311,83 @@ const dispatchSalesOrder = async (req, res) => {
   }
 };
 
+const getSalesOrderById = async (req, res) => {
+  try {
+    const salesOrderId = req.params.id;
+
+    const orderResult = await pool.query(
+      `
+      SELECT
+        so.id,
+        so.order_number,
+        so.order_date,
+        so.total_amount,
+        so.status,
+        c.id AS customer_id,
+        c.company_name,
+        c.contact_person,
+        c.mobile,
+        c.email,
+        c.city,
+        q.id AS quotation_id,
+        q.quotation_number,
+        e.id AS enquiry_id,
+        e.enquiry_number
+      FROM sales_orders so
+      JOIN customers c
+        ON so.customer_id = c.id
+      JOIN quotations q
+        ON so.quotation_id = q.id
+      JOIN enquiries e
+        ON q.enquiry_id = e.id
+      WHERE so.id = $1
+      `,
+      [salesOrderId]
+    );
+
+    if (orderResult.rows.length === 0) {
+      return res.status(404).json({
+        message: "Sales Order not found",
+      });
+    }
+
+    const itemsResult = await pool.query(
+      `
+      SELECT
+        soi.product_id,
+        p.product_code,
+        p.product_name,
+        p.category,
+        p.unit,
+        soi.quantity,
+        soi.unit_price
+      FROM sales_order_items soi
+      JOIN products p
+        ON soi.product_id = p.id
+      WHERE soi.sales_order_id = $1
+      ORDER BY soi.id
+      `,
+      [salesOrderId]
+    );
+
+    res.json({
+      salesOrder: orderResult.rows[0],
+      products: itemsResult.rows,
+    });
+  } catch (error) {
+    console.error(error);
+
+    res.status(500).json({
+      message: "Server error",
+    });
+  }
+};
+
 module.exports = {
   getSalesOrders,
   confirmSalesOrder,
     dispatchSalesOrder,
+    getSalesOrderById,
 };
+
 

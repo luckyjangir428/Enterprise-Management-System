@@ -383,11 +383,131 @@ const getSalesOrderById = async (req, res) => {
   }
 };
 
+const cancelSalesOrder = async (req, res) => {
+  const client = await pool.connect();
+
+  try {
+    const salesOrderId = req.params.id;
+
+    await client.query("BEGIN");
+
+    const orderResult = await client.query(
+      `SELECT *
+       FROM sales_orders
+       WHERE id = $1
+       FOR UPDATE`,
+      [salesOrderId]
+    );
+
+    if (orderResult.rows.length === 0) {
+      await client.query("ROLLBACK");
+
+      return res.status(404).json({
+        message: "Sales Order not found",
+      });
+    }
+
+    const salesOrder = orderResult.rows[0];
+
+    if (salesOrder.status === "CANCELLED") {
+      await client.query("ROLLBACK");
+
+      return res.status(400).json({
+        message: "Sales Order is already cancelled",
+      });
+    }
+
+    if (salesOrder.status === "DISPATCHED") {
+      await client.query("ROLLBACK");
+
+      return res.status(400).json({
+        message: "Dispatched Sales Orders cannot be cancelled",
+      });
+    }
+
+    const itemsResult = await client.query(
+      `SELECT
+         product_id,
+         quantity
+       FROM sales_order_items
+       WHERE sales_order_id = $1`,
+      [salesOrderId]
+    );
+
+    // Release reserved inventory
+    if (salesOrder.status === "CONFIRMED") {
+      for (const item of itemsResult.rows) {
+        const inventoryResult = await client.query(
+          `SELECT *
+           FROM inventory
+           WHERE product_id = $1
+           FOR UPDATE`,
+          [item.product_id]
+        );
+
+        if (inventoryResult.rows.length === 0) {
+          await client.query("ROLLBACK");
+
+          return res.status(404).json({
+            message: "Inventory not found",
+          });
+        }
+
+        const inventory = inventoryResult.rows[0];
+
+        if (inventory.reserved_quantity < item.quantity) {
+          await client.query("ROLLBACK");
+
+          return res.status(400).json({
+            message:
+              "Reserved inventory is less than the order quantity",
+          });
+        }
+      }
+
+      for (const item of itemsResult.rows) {
+        await client.query(
+          `UPDATE inventory
+           SET reserved_quantity = reserved_quantity - $1
+           WHERE product_id = $2`,
+          [item.quantity, item.product_id]
+        );
+      }
+    }
+
+    const updatedOrder = await client.query(
+      `UPDATE sales_orders
+       SET status = 'CANCELLED'
+       WHERE id = $1
+       RETURNING *`,
+      [salesOrderId]
+    );
+
+    await client.query("COMMIT");
+
+    res.json({
+      message: "Sales Order cancelled successfully",
+      salesOrder: updatedOrder.rows[0],
+    });
+  } catch (error) {
+    await client.query("ROLLBACK");
+
+    console.error(error);
+
+    res.status(500).json({
+      message: "Server error",
+    });
+  } finally {
+    client.release();
+  }
+};
+
 module.exports = {
   getSalesOrders,
   confirmSalesOrder,
     dispatchSalesOrder,
     getSalesOrderById,
+    cancelSalesOrder,
 };
 
 

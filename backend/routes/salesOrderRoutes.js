@@ -4,7 +4,8 @@ const {
   getSalesOrders,
   confirmSalesOrder,
     dispatchSalesOrder,
-    getSalesOrderById
+    getSalesOrderById,
+    cancelSalesOrder
 } = require("../controllers/salesOrderController");
 
 const authenticateToken = require("../middleware/authMiddleware");
@@ -17,6 +18,7 @@ router.get(
   authenticateToken,
   authorizeRoles("ADMIN", "SALES_USER"),
   getSalesOrders
+
 );
 
 router.get(
@@ -38,6 +40,13 @@ router.post(
   authenticateToken,
   authorizeRoles("ADMIN"),
   dispatchSalesOrder
+);
+
+router.post(
+  "/:id/cancel",
+  authenticateToken,
+  authorizeRoles("ADMIN"),
+  cancelSalesOrder
 );
 
 

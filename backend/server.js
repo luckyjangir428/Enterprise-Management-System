@@ -1,4 +1,5 @@
 const express = require("express");
+const cors = require("cors");
 const pool = require("./config/db");
 const healthRoutes = require("./routes/healthRoutes");
 const authRoutes = require("./routes/authRoutes");
@@ -9,19 +10,29 @@ const inventoryRoutes = require("./routes/inventoryRoutes");
 const quotationRoutes = require("./routes/quotationRoutes");
 const salesOrderRoutes = require("./routes/salesOrderRoutes");
 const productRoutes = require("./routes/productRoutes");
+const errorHandler = require("./middleware/errorMiddleware");
+
 
 const app = express();
 app.use(express.json());
+
+app.use(
+  cors({
+    origin: "http://localhost:5173",
+  })
+);
 
 
 app.use("/api/health", healthRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/protected", protectedRoutes);
+app.use("/api/customers", customerRoutes);
 app.use("/api/enquiries", enquiryRoutes);
 app.use("/api/inventory", inventoryRoutes);
 app.use("/api/quotations", quotationRoutes);
 app.use("/api/sales-orders", salesOrderRoutes);
 app.use("/api/products", productRoutes);
+
 
 const PORT = process.env.PORT || 5000;
 
@@ -41,6 +52,8 @@ app.get("/db-test", async (req, res) => {
     });
   }
 });
+
+app.use(errorHandler);
 
 app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);

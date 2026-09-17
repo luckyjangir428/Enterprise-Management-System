@@ -3,6 +3,11 @@ const pool = require("./config/db");
 const healthRoutes = require("./routes/healthRoutes");
 const authRoutes = require("./routes/authRoutes");
 const protectedRoutes = require("./routes/protectedRoutes");
+const customerRoutes = require("./routes/customerRoutes");
+const enquiryRoutes = require("./routes/enquiryRoutes");
+const inventoryRoutes = require("./routes/inventoryRoutes");
+const quotationRoutes = require("./routes/quotationRoutes");
+const salesOrderRoutes = require("./routes/salesOrderRoutes");
 
 const app = express();
 app.use(express.json());
@@ -11,6 +16,10 @@ app.use(express.json());
 app.use("/api/health", healthRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/protected", protectedRoutes);
+app.use("/api/enquiries", enquiryRoutes);
+app.use("/api/inventory", inventoryRoutes);
+app.use("/api/quotations", quotationRoutes);
+app.use("/api/sales-orders", salesOrderRoutes);
 
 const PORT = process.env.PORT || 5000;
 

@@ -73,51 +73,54 @@ const Enquiries = () => {
     setItems(items.filter((_, itemIndex) => itemIndex !== index));
   };
 
-  const handleSubmit = async (event) => {
-    event.preventDefault();
+ 
+const handleSubmit = async (event) => {
+  event.preventDefault();
 
-    setError("");
-    setSuccess("");
-    setSubmitting(true);
+  setError("");
+  setSuccess("");
+  setSubmitting(true);
 
-    try {
-      const data = await apiRequest("/enquiries", {
-        method: "POST",
-        body: JSON.stringify({
-          customer_id: Number(customerId),
-          enquiry_date: enquiryDate,
-          required_date: requiredDate || null,
-          notes,
-          items: items.map((item) => ({
-            product_id: Number(item.product_id),
-            quantity: Number(item.quantity),
-          })),
-        }),
-      });
+  try {
+    const data = await apiRequest("/enquiries", {
+      method: "POST",
+      body: JSON.stringify({
+        enquiryNumber: `ENQ-${Date.now()}`,
+        customerId: Number(customerId),
+        requiredDate,
+        products: items.map((item) => ({
+          productId: Number(item.product_id),
+          quantity: Number(item.quantity),
+        })),
+        notes,
+      }),
+    });
 
-      setSuccess(
-        `Enquiry ${data.enquiry.enquiry_number} created successfully.`
-      );
+    setSuccess(
+      `Enquiry ${data.enquiry.enquiry_number} created successfully.`
+    );
 
-      setCustomerId("");
-      setEnquiryDate("");
-      setRequiredDate("");
-      setNotes("");
+    setCustomerId("");
+    setEnquiryDate("");
+    setRequiredDate("");
+    setNotes("");
 
-      setItems([
-        {
-          product_id: "",
-          quantity: 1,
-        },
-      ]);
+    setItems([
+      {
+        product_id: "",
+        quantity: 1,
+      },
+    ]);
 
-      await loadData();
-    } catch (error) {
-      setError(error.message);
-    } finally {
-      setSubmitting(false);
-    }
-  };
+    await loadData();
+  } catch (error) {
+    setError(error.message);
+  } finally {
+    setSubmitting(false);
+  }
+};
+
+
 
   return (
     <div className="min-h-screen bg-gray-100">
@@ -206,6 +209,7 @@ const Enquiries = () => {
                 <input
                   type="date"
                   value={requiredDate}
+                   min={enquiryDate}
                   onChange={(event) =>
                     setRequiredDate(event.target.value)
                   }
